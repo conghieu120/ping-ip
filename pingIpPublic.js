@@ -12,6 +12,8 @@ async function getIpPublic() {
 
 let ip = ''
 const getAndCheckIpPublic = async function () {
+  const bot_token = process.env.TELEGRAM_BOT_TOKEN
+  const chat_id = process.env.TELEGRAM_CHAT_ID
   const newIp = await getIpPublic()
   if (newIp !== ip) {
     ip = newIp;
@@ -24,9 +26,6 @@ const getAndCheckIpPublic = async function () {
 }
 
 export function pingIpPublic() {
-  const bot_token = process.env.TELEGRAM_BOT_TOKEN
-  const chat_id = process.env.TELEGRAM_CHAT_ID
-  console.log({bot_token, chat_id});
   getAndCheckIpPublic()
   setInterval(getAndCheckIpPublic, 120000)
 }
