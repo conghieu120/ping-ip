@@ -10,22 +10,23 @@ async function getIpPublic() {
   }
 }
 
+let ip = ''
+const getAndCheckIpPublic = async function () {
+  const newIp = await getIpPublic()
+  if (newIp !== ip) {
+    ip = newIp;
+    sendMessageToTelegram({
+      bot_token,
+      chat_id,
+      text: `Địa chỉ IP mới: ${ip}`,
+    })
+  }
+}
 
 export function pingIpPublic() {
   const bot_token = process.env.TELEGRAM_BOT_TOKEN
   const chat_id = process.env.TELEGRAM_CHAT_ID
   console.log({bot_token, chat_id});
-
-  let ip = ''
-  setInterval(async () => {
-    const newIp = await getIpPublic()
-    if (newIp !== ip) {
-      ip = newIp;
-      sendMessageToTelegram({
-        bot_token,
-        chat_id,
-        text: `Địa chỉ IP mới: ${ip}`,
-      })
-    }
-  }, 60000)
+  getAndCheckIpPublic()
+  setInterval(getAndCheckIpPublic, 120000)
 }
