@@ -1,4 +1,5 @@
 import axios from "axios";
+import {networkInterfaces} from "os";
 import { sendMessageToTelegram } from "./telegram.js";
 
 async function getIpPublic() {
@@ -10,15 +11,30 @@ async function getIpPublic() {
   }
 }
 
+
+function getLocalIPv4() {
+  const interfaces = networkInterfaces();
+  for (const name of Object.keys(interfaces)) {
+    for (const interfaceItem of interfaces[name]) {
+      if (interfaceItem.family === 'IPv4' && !interfaceItem.internal) {
+        return interfaceItem.address;
+      }
+    }
+  }
+  return null;
+}
+
 let ip = ''
-const getAndCheckIpPublic = async function () {
+let ipLocal = ''
+const getAndCheckIp = async function () {
   const newIp = await getIpPublic()
-  if (newIp !== ip) {
+  const newIpLocal = getLocalIPv4()
+  if (newIp !== ip || newIpLocal !== ipLocal) {
     ip = newIp;
     sendMessageToTelegram({
       bot_token,
       chat_id,
-      text: `Địa chỉ IP mới: ${ip}`,
+      text: `IP public: ${ip}, IP local: ${newIpLocal}`,
     })
   }
 }
@@ -27,6 +43,6 @@ export function pingIpPublic() {
   const bot_token = process.env.TELEGRAM_BOT_TOKEN
   const chat_id = process.env.TELEGRAM_CHAT_ID
   console.log({bot_token, chat_id});
-  getAndCheckIpPublic()
-  setInterval(getAndCheckIpPublic, 120000)
+  getAndCheckIp()
+  setInterval(getAndCheckIp, 120000)
 }
