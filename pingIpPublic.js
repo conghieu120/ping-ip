@@ -16,7 +16,7 @@ function getLocalIPv4() {
   const interfaces = networkInterfaces();
   for (const name of Object.keys(interfaces)) {
     for (const interfaceItem of interfaces[name]) {
-      if (interfaceItem.family === 'IPv4' && !interfaceItem.internal) {
+      if (interfaceItem.family === 'IPv4' && interfaceItem.address.includes('192.168.')) {
         return interfaceItem.address;
       }
     }
@@ -27,22 +27,22 @@ function getLocalIPv4() {
 let ip = ''
 let ipLocal = ''
 const getAndCheckIp = async function () {
+  const bot_token = process.env.TELEGRAM_BOT_TOKEN
+  const chat_id = process.env.TELEGRAM_CHAT_ID
   const newIp = await getIpPublic()
   const newIpLocal = getLocalIPv4()
   if (newIp !== ip || newIpLocal !== ipLocal) {
     ip = newIp;
+    ipLocal = newIpLocal;
     sendMessageToTelegram({
       bot_token,
       chat_id,
-      text: `IP public: ${ip}, IP local: ${newIpLocal}`,
+      text: `IP public: ${ip?.trim()}, IP local: ${newIpLocal?.trim()}`,
     })
   }
 }
 
 export function pingIpPublic() {
-  const bot_token = process.env.TELEGRAM_BOT_TOKEN
-  const chat_id = process.env.TELEGRAM_CHAT_ID
-  console.log({bot_token, chat_id});
   getAndCheckIp()
-  setInterval(getAndCheckIp, 120000)
+  setInterval(getAndCheckIp, 300000)
 }
