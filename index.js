@@ -1,4 +1,4 @@
 import 'dotenv/config'
-import { pingIpPublic } from "./pingIpPublic.js";
+import { getAndCheckIp } from "./pingIpPublic.js";
 
-pingIpPublic()
+getAndCheckIp()
