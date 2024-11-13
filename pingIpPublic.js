@@ -47,7 +47,7 @@ export const getAndCheckIp = async function () {
     await sendMessageToTelegram({
       bot_token,
       chat_id,
-      text: `IP public: ${ip?.trim()}, IP local: ${newIpLocal?.trim()}`,
+      text: `IP public: ${newIp?.trim()}, IP local: ${newIpLocal?.trim()}`,
     })
   }
 }
