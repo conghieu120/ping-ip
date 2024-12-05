@@ -5,6 +5,7 @@ import { networkInterfaces } from "os";
 import { readFileSync, writeFileSync } from "fs";
 
 import { sendMessageToTelegram } from "./telegram.js";
+import { updateDnsRecord } from "./updateDnsRecord.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -44,10 +45,13 @@ export const getAndCheckIp = async function () {
   const newIpLocal = getLocalIPv4()
   if (newIp !== ip || newIpLocal !== ipLocal) {
     writeFileSync(filePath, newIp + '|' + newIpLocal)
-    await sendMessageToTelegram({
-      bot_token,
-      chat_id,
-      text: `IP public: ${ip?.trim()}, IP local: ${newIpLocal?.trim()}`,
-    })
+    await Promise.all([
+      sendMessageToTelegram({
+        bot_token,
+        chat_id,
+        text: `IP public: ${newIp?.trim()}, IP local: ${newIpLocal?.trim()}`,
+      }),
+      updateDnsRecord(newIp?.trim()),
+    ])
   }
 }
